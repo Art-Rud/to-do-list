@@ -7,6 +7,7 @@ export const buttonDelete =
 const input = document.querySelector(".input-js");
 const btn = document.querySelector(".btn-add");
 const list = document.querySelector(".todo-list");
+const storageData = JSON.parse(localStorage.getItem("todo"));
 const createToDo = () => {
   if (input.value.trim() === "") {
     return;
@@ -32,3 +33,33 @@ const createItem = (todo) => {
   return newItem;
 };
 btn.addEventListener("click", createToDo);
+
+const onReloadPage = () => {
+  const markUp = storageData.map(createItem);
+  list.append(...markUp);
+}
+
+if (storageData !== null) onReloadPage();
+
+const changeStatus = (e) => {
+  if (e.target.nodeName !== 'LI') return;
+  if (e.target.classList.contains('todo')) {
+    e.target.classList.replace('todo', 'complete');
+    e.target.lastElementChild.remove();
+    e.target.insertAdjacentHTML('beforeend', buttonDelete);
+  } else {
+    e.target.classList.replace('complete', 'todo');
+    e.target.lastElementChild.remove();
+    e.target.insertAdjacentHTML('beforeend', buttonUpdate);
+  }
+  
+  const data = JSON.parse(localStorage.getItem("todo"));
+  const updatedData = data.map(item => {
+    if (item.id === +e.target.id){
+      item.status = e.target.classList[0];
+    }
+    return item;
+  });
+  localStorage.setItem('todo', JSON.stringify(updatedData));
+}
+list.addEventListener('click', changeStatus);
