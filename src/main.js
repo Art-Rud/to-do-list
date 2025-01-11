@@ -37,29 +37,53 @@ btn.addEventListener("click", createToDo);
 const onReloadPage = () => {
   const markUp = storageData.map(createItem);
   list.append(...markUp);
-}
+};
 
 if (storageData !== null) onReloadPage();
 
 const changeStatus = (e) => {
-  if (e.target.nodeName !== 'LI') return;
-  if (e.target.classList.contains('todo')) {
-    e.target.classList.replace('todo', 'complete');
+  if (e.target.nodeName !== "LI") return;
+  if (e.target.classList.contains("todo")) {
+    e.target.classList.replace("todo", "complete");
     e.target.lastElementChild.remove();
-    e.target.insertAdjacentHTML('beforeend', buttonDelete);
+    e.target.insertAdjacentHTML("beforeend", buttonDelete);
   } else {
-    e.target.classList.replace('complete', 'todo');
+    e.target.classList.replace("complete", "todo");
     e.target.lastElementChild.remove();
-    e.target.insertAdjacentHTML('beforeend', buttonUpdate);
+    e.target.insertAdjacentHTML("beforeend", buttonUpdate);
   }
-  
+
   const data = JSON.parse(localStorage.getItem("todo"));
-  const updatedData = data.map(item => {
-    if (item.id === +e.target.id){
+  const updatedData = data.map((item) => {
+    if (item.id === +e.target.id) {
       item.status = e.target.classList[0];
     }
     return item;
   });
-  localStorage.setItem('todo', JSON.stringify(updatedData));
-}
-list.addEventListener('click', changeStatus);
+  localStorage.setItem("todo", JSON.stringify(updatedData));
+};
+list.addEventListener("click", changeStatus);
+
+const removeIteam = (e) => {
+  if (!e.target.classList.contains("btn-delete")) return;
+
+  e.target.parentNode.remove();
+
+  const dataLS = JSON.parse(localStorage.getItem("todo"));
+  const deleteIteam = dataLS.filter(
+    (iteam) => iteam.id !== +e.target.parentNode.id
+  );
+
+  localStorage.setItem("todo", JSON.stringify(deleteIteam));
+};
+
+list.addEventListener("click", removeIteam);
+
+//  модальне вікно
+
+/*instance = basicLightbox.create(
+    `<div class="modal-container"><button type="button" class="btn-close-modal">X</button><input type="text" class="input-modal"/><button type="button" class="btn-update-modal" id="${e.target.parentNode.id}">Update todo</button></div>`,
+    {
+      closable: false,
+    }
+  );*/
