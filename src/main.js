@@ -1,5 +1,5 @@
 import * as basicLightbox from "basiclightbox";
-// import "basiclightbox/dist/basicLightbox.min.css";
+import "basiclightbox/dist/basicLightbox.min.css";
 export const buttonUpdate =
   '<button type="button" class="btn-update" ></button>';
 export const buttonDelete =
@@ -7,6 +7,7 @@ export const buttonDelete =
 const input = document.querySelector(".input-js");
 const btn = document.querySelector(".btn-add");
 const list = document.querySelector(".todo-list");
+
 const storageData = JSON.parse(localStorage.getItem("todo"));
 const createToDo = () => {
   if (input.value.trim() === "") {
@@ -78,6 +79,64 @@ const removeIteam = (e) => {
 };
 
 list.addEventListener("click", removeIteam);
+
+const editTask = (e) => {
+  if (!e.target.classList.contains("btn-update")) return;
+
+  const taskId = +e.target.parentNode.id;
+  const data = JSON.parse(localStorage.getItem("todo"));
+  const taskEdit = data.find((task) => task.id === taskId);
+
+  console.log(taskEdit);
+
+  const instance = basicLightbox.create(
+    `<div class="modal-container"><button type="button" class="btn-close-modal">X</button><input type="text" class="input-modal" value="${taskEdit.text}"/><button type="button" class="btn-update-modal" id="${e.target.parentNode.id}">Update todo</button></div>`,
+    {
+      closable: false,
+    }
+  );
+
+  instance.show();
+
+  const instansModal = instance.element();
+  instansModal
+    .querySelector(".btn-close-modal")
+    .addEventListener("click", () => {
+      instance.close();
+    });
+
+  instansModal
+    .querySelector(".btn-update-modal")
+    .addEventListener("click", () => {
+      const rebornTask = instansModal
+        .querySelector(".input-modal")
+        .value.trim();
+
+      if (rebornTask === "") {
+        alert("Завдання не може бути пустим");
+        return;
+      }
+      if (rebornTask === taskEdit.text) {
+        alert("Завдання не змінене");
+        return;
+      }
+
+      const rebornTaskInData = data.map((task) => {
+        if (task.id === taskId) {
+          task.text = rebornTask;
+        }
+        return task;
+      });
+      localStorage.setItem("todo", JSON.stringify(rebornTaskInData));
+
+      const taskIteam = document.getElementById(taskId);
+      taskIteam.firstChild.textContent = rebornTask;
+
+      instance.close();
+    });
+};
+
+list.addEventListener("click", editTask);
 
 //  модальне вікно
 
